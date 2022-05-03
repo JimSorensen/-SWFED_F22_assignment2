@@ -1,9 +1,7 @@
-import React from 'react'
+import StartingPageContent from "../components/StartingPage/StartingPageContent";
 
 const HomePage = () => {
-  return (
-    <div>HomePage</div>
-  )
-}
+  return <StartingPageContent />;
+};
 
-export default HomePage
+export default HomePage;

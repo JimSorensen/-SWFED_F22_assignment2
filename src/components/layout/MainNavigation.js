@@ -13,18 +13,23 @@ const MainNavigation = () => {
             </NavLink>
           </li>
           <li>
+            <NavLink to="/auth" activeClassName={classes.active}>
+              Log ud
+            </NavLink>
+          </li>
+          <li>
             <NavLink to="/profile" activeClassName={classes.active}>
               Profil
             </NavLink>
           </li>
           <li>
             <NavLink to="/models" activeClassName={classes.active}>
-              All Models
+              Alle modeler
             </NavLink>
           </li>
           <li>
             <NavLink to="/new-model" activeClassName={classes.active}>
-              Add Model
+              Tilføj Model
             </NavLink>
           </li>
         </ul>

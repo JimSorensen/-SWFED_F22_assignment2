@@ -25,7 +25,7 @@ const AuthForm = () => {
           <button
             type="button"
             className={classes.toggle}
-            onClick={switchModeHandler}
+            onClick={switchAuthModeHandler}
           >
             {isLogin ? "Opret Ny Konto" : "Log ind med en konto"}
           </button>
