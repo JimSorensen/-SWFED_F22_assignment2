@@ -1,71 +1,116 @@
-import { useState, useRef } from "react";
 import classes from "./AuthForm.module.css";
+import { useRef, useState, useEffect, useContext } from "react";
+import AuthContext from "../../context/AuthProvider";
+import axios from "../../api/axios";
+const LOGIN_URL = "/api/Account/login";
 
 const AuthForm = () => {
-  const emailInputRef = useRef();
-  const passwordInputRef = useRef();
+  const { setAuth } = useContext(AuthContext);
+  const userRef = useRef();
+  const errRef = useRef();
 
-  const [isLogin, setIsLogin] = useState(true);
-  const [isLoading, setIsLoading] = useState(false); 
+  const [user, setUser] = useState("");
+  const [pwd, setPwd] = useState("");
+  const [errMsg, setErrMsg] = useState("");
+  const [success, setSuccess] = useState(false);
 
-  const authSubmitHandler = (event) => {
-    event.preventDefault();
-    const enteredEmail = emailInputRef.current.value;
-    const enteredPassword = passwordInputRef.current.value;
+  useEffect(() => {
+    userRef.current.focus();
+  }, []);
 
-    setIsLoading(true);
-    let url;
-    if(isLogin){
-      url = 'https://localhost:7181/api/Account/login';
-    }else{
-      url = 
-      fetch('https://localhost:7181/api/Managers',
+  useEffect(() => {
+    setErrMsg("");
+  }, [user, pwd]);
+
+   
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    try {
+      const response = await axios.post(
+        LOGIN_URL,
+        JSON.stringify({ user, pwd }),
         {
-          method: 'POST',
-          body: JSON.stringify({
-            email: enteredEmail,
-            password: enteredPassword,
-            returnSecureToken: true
-          }),
-          headers: {
-            'Content-Type' : 'application/json'
-          }
+          headers: { "Content-Type": "application/json" },
+          withCredentials: true,
         }
-      ).then(res => {
-        setIsLoading(false);
-        if (res.ok){
-          ///.....
-        }else{
-          return res.json().then(data => {
-            let errorMessage = 'Dit login fejlede!...';
-            if (data && data.error && data.error.message){
-            errorMessage = data.error.message;
-            }
-            alert(errorMessage);
-          });
-        }
-      });
+      );
+      console.log(JSON.stringify(response?.data));
+      //console.log(JSON.stringify(response));
+      const accessToken = response?.data?.accessToken;
+      const roles = response?.data?.roles;
+      setAuth({ user, pwd, roles, accessToken });
+      setUser("");
+      setPwd("");
+      setSuccess(true);
+    } catch (err) {
+      if (!err?.response) {
+        setErrMsg("No Server Response");
+      } else if (err.response?.status === 400) {
+        setErrMsg("Missing Username or Password");
+      } else if (err.response?.status === 401) {
+        setErrMsg("Unauthorized");
+      } else {
+        setErrMsg("Login Failed");
+      }
+      errRef.current.focus();
     }
-  }
+  };
 
+  //Manager: boss@m.dk  asdfQWER
+  //Model: nc@m.dk  Pas123
+  //https://localhost:7181/api/Account/login
   return (
-    <section className={classes.auth}>
-      <h1>Log ind her</h1>
-      <form onSubmit={authSubmitHandler}>
-        <div className={classes.control}>
-          <label htmlFor="email">Din Email</label>
-          <input type="email" id="email" required ref={emailInputRef} />
-        </div>
-        <div className={classes.control}>
-          <label htmlFor="password">Din kode</label>
-          <input type="password" id="password" required ref={passwordInputRef} />
-        </div>
-        <div className={classes.actions}>
-          <button> Login </button>
-          {isLoading && <p>Sending request....</p>}          
-        </div>
-      </form>
-    </section>
+    <>
+      {success ? (
+        <section>
+          <h1>Du er logget ind</h1>
+          <br />
+          <p>
+            <a href="/">Gå til forsiden</a>
+          </p>
+        </section>
+      ) : (
+        <section className={classes.auth}>
+          <p
+            ref={errRef}
+            className={errMsg ? "errmsg" : "offscreen"}
+            aria-live="assertive"
+          >
+            {errMsg}
+          </p>
+          <h1>Log Ind Her..</h1>
+
+          <form onSubmit={handleSubmit}>
+            <div className={classes.control}>
+              <label htmlFor="username">E-mail:</label>
+              <input
+                type="text"
+                id="username"
+                ref={userRef}
+                autoComplete="on"
+                onChange={(e) => setUser(e.target.value)}
+                value={user}
+                required
+              />
+            </div>
+            <div className={classes.control}>
+              <label htmlFor="password">Kode:</label>
+              <input
+                type="password"
+                id="password"
+                onChange={(e) => setPwd(e.target.value)}
+                value={pwd}
+                required
+              />
+            </div>
+            <div className={classes.actions}>
+              <button>Log Ind</button>
+            </div>
+          </form>
+        </section>
+      )}
+    </>
   );
 };
 
