@@ -2,7 +2,7 @@ import "./App.css";
 import { Route, Switch, Redirect } from "react-router-dom";
 import AllModels from "./pages/AllModels";
 import ModelDetail from "./pages/ModelDetail";
-import NewModel from "./pages/NewModel";
+import NewModelpage from "./pages/NewModelPage";
 import Layout from "./components/layout/Layout";
 import UserProfile from "./components/Profile/UserProfile";
 import AuthPage from "./pages/AuthPage";
@@ -31,7 +31,7 @@ function App() {
           <ModelDetail />
         </Route>
         <Route path="/new-model">
-          <NewModel />
+          <NewModelpage />
         </Route>
       </Switch>
     </Layout>

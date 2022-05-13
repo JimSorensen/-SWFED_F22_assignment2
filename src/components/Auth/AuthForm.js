@@ -9,8 +9,8 @@ const AuthForm = () => {
   const userRef = useRef();
   const errRef = useRef();
 
-  const [user, setUser] = useState("");
-  const [pwd, setPwd] = useState("");
+  const [email, setUser] = useState("");
+  const [password, setPwd] = useState("");
   const [errMsg, setErrMsg] = useState("");
   const [success, setSuccess] = useState(false);
 
@@ -20,26 +20,26 @@ const AuthForm = () => {
 
   useEffect(() => {
     setErrMsg("");
-  }, [user, pwd]);
+  }, [email, password]);
 
-   
   const handleSubmit = async (e) => {
     e.preventDefault();
 
     try {
       const response = await axios.post(
         LOGIN_URL,
-        JSON.stringify({ user, pwd }),
+        JSON.stringify({ email: email, password: password }),
         {
           headers: { "Content-Type": "application/json" },
           withCredentials: true,
         }
       );
       console.log(JSON.stringify(response?.data));
-      //console.log(JSON.stringify(response));
+      let token = await response?.data;
+      localStorage.setItem("token", token.jwt);
       const accessToken = response?.data?.accessToken;
       const roles = response?.data?.roles;
-      setAuth({ user, pwd, roles, accessToken });
+      setAuth({ user: email, pwd: password, roles, accessToken });
       setUser("");
       setPwd("");
       setSuccess(true);
@@ -47,7 +47,7 @@ const AuthForm = () => {
       if (!err?.response) {
         setErrMsg("No Server Response");
       } else if (err.response?.status === 400) {
-        setErrMsg("Missing Username or Password");
+        setErrMsg("Unauthorized");
       } else if (err.response?.status === 401) {
         setErrMsg("Unauthorized");
       } else {
@@ -56,8 +56,8 @@ const AuthForm = () => {
       errRef.current.focus();
     }
   };
-  //-----------------------------------------------
-/*
+
+  /*
 async login() {
 let url = "https://localhost:44368/api/account/login";
 try {
@@ -80,10 +80,11 @@ alert("Error: " + err);
 }
 return;
 */
-//-------------------------------------------------
+  //-------------------------------------------------
   //Manager: boss@m.dk  asdfQWER
   //Model: nc@m.dk  Pas123
   //https://localhost:7181/api/Account/login
+
   return (
     <>
       {success ? (
@@ -114,7 +115,7 @@ return;
                 ref={userRef}
                 autoComplete="on"
                 onChange={(e) => setUser(e.target.value)}
-                value={user}
+                value={email}
                 required
               />
             </div>
@@ -124,7 +125,7 @@ return;
                 type="password"
                 id="password"
                 onChange={(e) => setPwd(e.target.value)}
-                value={pwd}
+                value={password}
                 required
               />
             </div>
