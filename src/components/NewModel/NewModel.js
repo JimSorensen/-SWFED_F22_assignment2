@@ -60,8 +60,8 @@ const NewModel = () => {
         }
       );
       console.log(JSON.stringify(response?.data));
-    } catch (err) {
-     
+
+    } catch (err) {     
      
     }
   };

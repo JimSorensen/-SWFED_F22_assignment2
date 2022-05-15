@@ -34,14 +34,11 @@ const AuthForm = () => {
           withCredentials: true,
         }
       );
-      console.log(JSON.stringify(response?.data));
+     
       let token = await response?.data;
+            
       localStorage.setItem("token", token.jwt);
-      const accessToken = response?.data?.accessToken;
-      const roles = response?.data?.roles;
-      setAuth({ user: email, pwd: password, roles, accessToken });
-      setUser("");
-      setPwd("");
+
       setSuccess(true);
     } catch (err) {
       if (!err?.response) {
